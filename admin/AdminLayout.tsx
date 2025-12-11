@@ -1,108 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Menu, Folder, Layers, Newspaper, LogOut, Lock, User, Phone, Video } from 'lucide-react';
 
-const AdminLayout: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+import React from 'react';
+import { NavLink, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { LayoutDashboard, FolderKanban, GalleryHorizontal, Newspaper, Clapperboard, Menu, MessageSquare, Info } from 'lucide-react';
 
-  useEffect(() => {
-    const auth = localStorage.getItem('isAdminAuthenticated');
-    if (auth === 'true') {
-        setIsAuthenticated(true);
-    }
-  }, []);
+// Import individual page components
+import Dashboard from './pages/Dashboard';
+import ManageProjects from './pages/ManageProjects';
+import ManageCollections from './pages/ManageCollections';
+import ManageNews from './pages/ManageNews';
+import ManageVideos from './pages/ManageVideos';
+import ManageMenu from './pages/ManageMenu';
+import ManageAbout from './pages/ManageAbout';
+import ManageContact from './pages/ManageContact';
 
-  const handleLogin = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (username === 'admin' && password === 'admin123') {
-          localStorage.setItem('isAdminAuthenticated', 'true');
-          setIsAuthenticated(true);
-          setError('');
-      } else {
-          setError('Tài khoản hoặc mật khẩu không đúng!');
-      }
-  };
+const navItems = [
+    { path: '/admin/dashboard', label: 'Tổng quan', icon: LayoutDashboard },
+    { path: '/admin/projects', label: 'Dự án', icon: FolderKanban },
+    { path: '/admin/collections', label: 'Bộ sưu tập', icon: GalleryHorizontal },
+    { path: '/admin/news', label: 'Tin tức', icon: Newspaper },
+    { path: '/admin/videos', label: 'Video', icon: Clapperboard },
+    { path: '/admin/menu', label: 'Menu', icon: Menu },
+    { path: '/admin/about', label: 'Về chúng tôi', icon: Info },
+    { path: '/admin/contact', label: 'Liên hệ', icon: MessageSquare },
+];
 
-  const handleLogout = () => {
-      localStorage.removeItem('isAdminAuthenticated');
-      setIsAuthenticated(false);
-      navigate('/');
-  };
-
-  const navItems = [
-    { label: "Dashboard", path: "/admin", icon: LayoutDashboard },
-    { label: "Bộ sưu tập", path: "/admin/collections", icon: Layers },
-    { label: "Dự án", path: "/admin/projects", icon: Folder },
-    { label: "Tin tức", path: "/admin/news", icon: Newspaper },
-    { label: "Video", path: "/admin/videos", icon: Video },
-    { label: "Chúng tôi là ai", path: "/admin/about", icon: User },
-    { label: "Thông tin liên hệ", path: "/admin/contact", icon: Phone },
-    { label: "Quản lý Menu", path: "/admin/menu", icon: Menu },
-  ];
-
-  if (!isAuthenticated) {
-      return (
-          <div className="min-h-screen bg-gray-100 flex items-center justify-center font-sans">
-              <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-200">
-                  <div className="text-center mb-8">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full text-white mb-4">
-                          <Lock size={32} />
-                      </div>
-                      <h1 className="text-2xl font-serif font-bold text-gray-800">Đăng nhập Admin</h1>
-                  </div>
-                  <form onSubmit={handleLogin} className="space-y-6">
-                      <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Tài khoản</label>
-                          <input type="text" className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" value={username} onChange={(e) => setUsername(e.target.value)} />
-                      </div>
-                      <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
-                          <input type="password" className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" value={password} onChange={(e) => setPassword(e.target.value)} />
-                      </div>
-                      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                      <button type="submit" className="w-full bg-primary text-white py-3 rounded-lg hover:bg-black transition-colors">Đăng nhập</button>
-                  </form>
-              </div>
-          </div>
-      );
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-100 flex font-sans text-gray-800">
-      <aside className="w-64 bg-white shadow-xl flex flex-col fixed h-full z-20">
-        <div className="p-8 border-b border-gray-100 flex items-center justify-center">
-            <h1 className="font-serif text-2xl font-bold tracking-widest text-primary">ADMIN</h1>
+const Sidebar: React.FC = () => (
+    <div className="w-64 bg-gray-800 text-white flex flex-col">
+        <div className="p-6 text-2xl font-serif font-bold text-center border-b border-gray-700">
+            <NavLink to="/" className="hover:text-accent transition-colors">Passion Admin</NavLink>
         </div>
-        <nav className="flex-grow p-4 space-y-2 overflow-y-auto">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
-                >
-                  <Icon size={20} />
-                  <span className="font-medium text-sm">{item.label}</span>
-                </Link>
-              );
-            })}
+        <nav className="flex-grow p-4">
+            <ul>
+                {navItems.map(({ path, label, icon: Icon }) => (
+                    <li key={path}>
+                        <NavLink 
+                            to={path} 
+                            className={({ isActive }) => 
+                                `flex items-center px-4 py-3 my-1 rounded-lg transition-all text-sm font-medium ${isActive ? 'bg-accent text-white' : 'hover:bg-gray-700'}`
+                            }
+                        >
+                            <Icon size={18} className="mr-3" />
+                            {label}
+                        </NavLink>
+                    </li>
+                ))}
+            </ul>
         </nav>
-        <div className="p-4 border-t border-gray-100">
-            <button onClick={handleLogout} className="w-full flex items-center space-x-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg">
-                <LogOut size={20} /> <span className="font-medium text-sm">Đăng xuất</span>
-            </button>
-        </div>
-      </aside>
-      <main className="flex-grow p-8 overflow-y-auto h-screen ml-64"><Outlet /></main>
     </div>
-  );
+);
+
+export const AdminLayout: React.FC = () => {
+    const location = useLocation();
+
+    // Find the current page title based on the path
+    const currentPage = navItems.find(item => item.path === location.pathname);
+    const pageTitle = currentPage ? `Admin / ${currentPage.label}` : 'Admin';
+
+    return (
+        <div className="flex h-screen bg-gray-50 font-sans">
+            <Sidebar />
+            <main className="flex-1 p-8 overflow-y-auto">
+                <Routes>
+                    <Route path="/" element={<Navigate to="dashboard" replace />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="projects" element={<ManageProjects />} />
+                    <Route path="collections" element={<ManageCollections />} />
+                    <Route path="news" element={<ManageNews />} />
+                    <Route path="videos" element={<ManageVideos />} />
+                    <Route path="menu" element={<ManageMenu />} />
+                    <Route path="about" element={<ManageAbout />} />
+                    <Route path="contact" element={<ManageContact />} />
+                </Routes>
+            </main>
+        </div>
+    );
 };
-export default AdminLayout;

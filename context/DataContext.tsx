@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api, AboutInfo, ContactInfo, VideoItem } from '../services/api';
 
-// --- Định nghĩa Model ---
+// --- Model Definitions ---
 export type { AboutInfo, ContactInfo, VideoItem } from '../services/api';
 
 export interface Project {
@@ -35,211 +36,175 @@ export interface NewsItem {
     img: string;
 }
 
+// --- Context Type Definition ---
 interface DataContextType {
   projects: Project[];
   menuItems: MenuItem[];
   collections: Collection[];
   news: NewsItem[];
+  videos: VideoItem[];
   aboutData: AboutInfo;
   contactInfo: ContactInfo;
-  videos: VideoItem[];
+  isLoaded: boolean;
 
-  addProject: (project: Omit<Project, 'id'>) => void;
-  deleteProject: (id: number) => void;
+  // CRUD Operations
+  addProject: (project: Omit<Project, 'id'>) => Promise<void>;
+  updateProject: (id: number, project: Partial<Project>) => Promise<void>;
+  deleteProject: (id: number) => Promise<void>;
   
-  addCollection: (collection: Omit<Collection, 'id'>) => void;
-  deleteCollection: (id: number) => void;
+  addCollection: (collection: Omit<Collection, 'id'>) => Promise<void>;
+  updateCollection: (id: number, collection: Partial<Collection>) => Promise<void>;
+  deleteCollection: (id: number) => Promise<void>;
   
-  addNews: (newsItem: Omit<NewsItem, 'id'>) => void;
-  deleteNews: (id: number) => void;
+  addNews: (newsItem: Omit<NewsItem, 'id'>) => Promise<void>;
+  updateNews: (id: number, newsItem: Partial<NewsItem>) => Promise<void>;
+  deleteNews: (id: number) => Promise<void>;
+
+  addVideo: (video: Omit<VideoItem, 'id'>) => Promise<void>;
+  updateVideo: (id: number, video: Partial<VideoItem>) => Promise<void>;
+  deleteVideo: (id: number) => Promise<void>;
   
-  // Menu CRUD
-  addMenuItem: (item: Omit<MenuItem, 'id'>) => void;
-  updateMenuItem: (id: number, item: Partial<MenuItem>) => void;
-  deleteMenuItem: (id: number) => void;
+  addMenuItem: (item: Omit<MenuItem, 'id'>) => Promise<void>;
+  updateMenuItem: (id: number, item: Partial<MenuItem>) => Promise<void>;
+  deleteMenuItem: (id: number) => Promise<void>;
 
-  updateAbout: (data: AboutInfo) => void;
-  updateContact: (data: ContactInfo) => void;
+  updateAbout: (data: AboutInfo) => Promise<void>;
+  updateContact: (data: ContactInfo) => Promise<void>;
 
-  addVideo: (video: Omit<VideoItem, 'id'>) => void;
-  deleteVideo: (id: number) => void;
-
-  resetData: () => void;
+  // Utility
   getItemBySlug: (slug: string) => Project | Collection | undefined;
 }
 
+// --- Initial State ---
+const InitialState = {
+    projects: [],
+    menuItems: [],
+    collections: [],
+    news: [],
+    videos: [],
+    aboutData: { title: '', description: '', img: '' },
+    contactInfo: { address: '', hotline: '', email: '', map_img: '' },
+    isLoaded: false,
+};
+
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// --- Dữ liệu mặc định ---
-const INITIAL_ABOUT: AboutInfo = {
-    title: "VỀ CHÚNG TÔI",
-    description: "PASSION Interiors là đơn vị tiên phong kiến tạo không gian sống đẳng cấp thượng lưu. Chúng tôi không chỉ thiết kế nội thất, chúng tôi dệt nên những câu chuyện về phong cách sống.",
-    img: "https://picsum.photos/id/403/1920/1080"
-};
+export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [state, setState] = useState(InitialState);
 
-const INITIAL_CONTACT: ContactInfo = {
-    address: "Số nhà 91, Lý Thường Kiệt, P. Cửa Nam, Hoàn Kiếm, Hà Nội",
-    hotline: "0986 038 689",
-    email: "info@passion.vn",
-    map_img: "https://picsum.photos/id/406/400/200"
-};
-
-export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [videos, setVideos] = useState<VideoItem[]>([]);
-  const [aboutData, setAboutData] = useState<AboutInfo>(INITIAL_ABOUT);
-  const [contactInfo, setContactInfo] = useState<ContactInfo>(INITIAL_CONTACT);
-  
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Load Data
+  // --- Data Loading Effect ---
   useEffect(() => {
-     // Mock loading logic matching previous implementation structure
-     // In real world, use api.getProjects(), api.getAbout() etc. here
-     const loadData = async () => {
-         const _about = await api.getAbout();
-         const _contact = await api.getContact();
-         setAboutData(_about);
-         setContactInfo(_contact);
+    const loadAllData = async () => {
+      try {
+        const [
+          projects,
+          collections,
+          news,
+          videos,
+          menuItems,
+          aboutData,
+          contactInfo
+        ] = await Promise.all([
+          api.getProjects(),
+          api.getCollections(),
+          api.getNews(),
+          api.getVideos(),
+          api.getMenuItems(),
+          api.getAbout(),
+          api.getContact()
+        ]);
 
-         // Restore List Data from LocalStorage (Mock)
-         const savedProjects = localStorage.getItem('passion_projects');
-         const savedMenu = localStorage.getItem('passion_menu');
-         const savedCollections = localStorage.getItem('passion_collections');
-         const savedNews = localStorage.getItem('passion_news');
-         const savedVideos = localStorage.getItem('passion_videos');
+        setState({
+          projects,
+          collections,
+          news,
+          videos,
+          menuItems,
+          aboutData,
+          contactInfo,
+          isLoaded: true
+        });
 
-         if (savedProjects) setProjects(JSON.parse(savedProjects));
-         else {
-             // Default Seed
-             setProjects([
-                { id: 1, title: "VINHOMES BẰNG LĂNG", category: "Villa", img: "https://picsum.photos/id/122/600/800", description: "Biệt thự ven sông đẳng cấp." },
-                { id: 2, title: "BIỆT THỰ HOA PHƯỢNG", category: "Villa", img: "https://picsum.photos/id/188/600/800", description: "Không gian sống xanh mát." },
-             ]);
-         }
+      } catch (error) {
+        console.error("Failed to load data:", error);
+        // Handle loading error appropriately
+      }
+    };
 
-         if (savedMenu) setMenuItems(JSON.parse(savedMenu));
-         else {
-             setMenuItems([
-                { id: 1, label: 'Trang chủ', subLabel: '– Về chúng tôi', path: '/', order: 1 },
-                { id: 2, label: 'Bộ sưu tập', path: '/collections', order: 2 },
-                { id: 3, label: 'Dự án', path: '/projects', order: 3 },
-                { id: 4, label: 'Liên hệ', path: '/contact', order: 6 },
-             ]);
-         }
-
-         if (savedVideos) setVideos(JSON.parse(savedVideos));
-         else {
-             setVideos([
-                 { id: 1, title: "Showroom Tour 2024", thumbnail: "https://picsum.photos/id/326/1920/1080", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
-             ]);
-         }
-
-         if (savedCollections) setCollections(JSON.parse(savedCollections));
-         if (savedNews) setNews(JSON.parse(savedNews));
-
-         setIsLoaded(true);
-     };
-     loadData();
+    loadAllData();
   }, []);
 
-  // Save Data changes
-  useEffect(() => {
-      if(isLoaded) {
-          localStorage.setItem('passion_projects', JSON.stringify(projects));
-          localStorage.setItem('passion_menu', JSON.stringify(menuItems));
-          localStorage.setItem('passion_collections', JSON.stringify(collections));
-          localStorage.setItem('passion_news', JSON.stringify(news));
-          localStorage.setItem('passion_videos', JSON.stringify(videos));
-          // About and Contact are saved inside their update functions via api.ts usually, 
-          // but for consistency in this mock context we sync state only.
-      }
-  }, [projects, menuItems, collections, news, videos, isLoaded]);
+  // --- CRUD Implementations ---
+  const createCrudOperations = <T extends {id: number}>(type: keyof typeof InitialState) => ({
+    add: async (item: Omit<T, 'id'>) => {
+        const newItem = await (api as any)[`add${type.charAt(0).toUpperCase() + type.slice(1, -1)}`](item);
+        setState(s => ({...s, [type]: [newItem, ...s[type as keyof typeof s] as T[]]}));
+    },
+    update: async (id: number, item: Partial<T>) => {
+        const updatedItem = await (api as any)[`update${type.charAt(0).toUpperCase() + type.slice(1, -1)}`](id, item);
+        setState(s => ({...s, [type]: (s[type as keyof typeof s] as T[]).map(x => x.id === id ? {...x, ...updatedItem} : x) }));
+    },
+    delete: async (id: number) => {
+        await (api as any)[`delete${type.charAt(0).toUpperCase() + type.slice(1, -1)}`](id);
+        setState(s => ({...s, [type]: (s[type as keyof typeof s] as T[]).filter(x => x.id !== id)}));
+    }
+  });
 
-  // --- Actions ---
+  const projectOps = createCrudOperations<Project>('projects');
+  const collectionOps = createCrudOperations<Collection>('collections');
+  const newsOps = createCrudOperations<NewsItem>('news');
+  const videoOps = createCrudOperations<VideoItem>('videos');
+  const menuItemOps = createCrudOperations<MenuItem>('menuItems');
 
-  const addProject = (project: Omit<Project, 'id'>) => {
-    setProjects(prev => [{ ...project, id: Date.now() }, ...prev]);
-  };
-  const deleteProject = (id: number) => {
-    setProjects(prev => prev.filter(p => p.id !== id));
-  };
-
-  const addCollection = (collection: Omit<Collection, 'id'>) => {
-    setCollections(prev => [{ ...collection, id: Date.now() }, ...prev]);
-  };
-  const deleteCollection = (id: number) => {
-    setCollections(prev => prev.filter(c => c.id !== id));
-  };
-
-  const addNews = (newsItem: Omit<NewsItem, 'id'>) => {
-    setNews(prev => [{ ...newsItem, id: Date.now() }, ...prev]);
-  };
-  const deleteNews = (id: number) => {
-    setNews(prev => prev.filter(n => n.id !== id));
-  };
-
-  // Menu Actions
-  const addMenuItem = (item: Omit<MenuItem, 'id'>) => {
-      setMenuItems(prev => [...prev, { ...item, id: Date.now() }]);
-  };
-  const updateMenuItem = (id: number, updated: Partial<MenuItem>) => {
-      setMenuItems(prev => prev.map(item => item.id === id ? { ...item, ...updated } : item));
-  };
-  const deleteMenuItem = (id: number) => {
-      setMenuItems(prev => prev.filter(i => i.id !== id));
-  };
-
-  // Video Actions
-  const addVideo = (video: Omit<VideoItem, 'id'>) => {
-      setVideos(prev => [{ ...video, id: Date.now() }, ...prev]);
-  };
-  const deleteVideo = (id: number) => {
-      setVideos(prev => prev.filter(v => v.id !== id));
-  };
-
-  // Single Page Actions
+  // --- Single Page Updates ---
   const updateAbout = async (data: AboutInfo) => {
       await api.updateAbout(data);
-      setAboutData(data);
+      setState(s => ({ ...s, aboutData: data }));
   };
   const updateContact = async (data: ContactInfo) => {
       await api.updateContact(data);
-      setContactInfo(data);
+      setState(s => ({ ...s, contactInfo: data }));
   };
-
-  const resetData = () => {
-      localStorage.clear();
-      window.location.reload();
-  };
-
+  
+  // --- Utility Functions ---
   const getItemBySlug = (slug: string) => {
-      const term = slug.replace(/-/g, ' ').toLowerCase();
-      return projects.find(p => p.title.toLowerCase().includes(term)) || 
-             collections.find(c => c.name.toLowerCase().includes(term));
+    const term = slug.replace(/-/g, ' ').toLowerCase();
+    return state.projects.find(p => p.title.toLowerCase().includes(term)) || 
+           state.collections.find(c => c.name.toLowerCase().includes(term));
   };
 
   return (
-    <DataContext.Provider value={{ 
-        projects, menuItems, collections, news, aboutData, contactInfo, videos,
-        addProject, deleteProject, 
-        addCollection, deleteCollection,
-        addNews, deleteNews,
-        addMenuItem, updateMenuItem, deleteMenuItem,
-        updateAbout, updateContact,
-        addVideo, deleteVideo,
-        resetData, getItemBySlug 
+    <DataContext.Provider value={{
+      ...state,
+      addProject: projectOps.add,
+      updateProject: projectOps.update,
+      deleteProject: projectOps.delete,
+      addCollection: collectionOps.add,
+      updateCollection: collectionOps.update,
+      deleteCollection: collectionOps.delete,
+      addNews: newsOps.add,
+      updateNews: newsOps.update,
+      deleteNews: newsOps.delete,
+      addVideo: videoOps.add,
+      updateVideo: videoOps.update,
+      deleteVideo: videoOps.delete,
+      addMenuItem: menuItemOps.add,
+      updateMenuItem: menuItemOps.update,
+      deleteMenuItem: menuItemOps.delete,
+      updateAbout,
+      updateContact,
+      getItemBySlug,
     }}>
       {children}
     </DataContext.Provider>
   );
 };
 
+// --- Custom Hook ---
 export const useData = () => {
   const context = useContext(DataContext);
-  if (context === undefined) throw new Error('useData must be used within a DataProvider');
+  if (context === undefined) {
+    throw new Error('useData must be used within a DataProvider');
+  }
   return context;
 };

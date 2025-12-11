@@ -24,6 +24,14 @@ app.post('/api/projects', (req, res) => {
         res.json({ id: result.insertId, ...req.body });
     });
 });
+app.put('/api/projects/:id', (req, res) => {
+    const { title, category, img, description } = req.body;
+    db.query('UPDATE projects SET title = ?, category = ?, img = ?, description = ? WHERE id = ?',
+    [title, category, img, description, req.params.id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json({ success: true, ...req.body });
+    });
+});
 app.delete('/api/projects/:id', (req, res) => {
     db.query('DELETE FROM projects WHERE id = ?', [req.params.id], (err) => {
         if (err) return res.status(500).json(err);
@@ -44,6 +52,14 @@ app.post('/api/collections', (req, res) => {
     [name, img, description], (err, result) => {
         if (err) return res.status(500).json(err);
         res.json({ id: result.insertId, ...req.body });
+    });
+});
+app.put('/api/collections/:id', (req, res) => {
+    const { name, img, description } = req.body;
+    db.query('UPDATE collections SET name = ?, img = ?, description = ? WHERE id = ?',
+    [name, img, description, req.params.id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json({ success: true, ...req.body });
     });
 });
 app.delete('/api/collections/:id', (req, res) => {
@@ -68,6 +84,14 @@ app.post('/api/news', (req, res) => {
         res.json({ id: result.insertId, ...req.body });
     });
 });
+app.put('/api/news/:id', (req, res) => {
+    const { title, date, summary, img } = req.body;
+    db.query('UPDATE news SET title = ?, date = ?, summary = ?, img = ? WHERE id = ?',
+    [title, date, summary, img, req.params.id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json({ success: true, ...req.body });
+    });
+});
 app.delete('/api/news/:id', (req, res) => {
     db.query('DELETE FROM news WHERE id = ?', [req.params.id], (err) => {
         if (err) return res.status(500).json(err);
@@ -88,6 +112,14 @@ app.post('/api/videos', (req, res) => {
     [title, thumbnail, video_url], (err, result) => {
         if (err) return res.status(500).json(err);
         res.json({ id: result.insertId, ...req.body });
+    });
+});
+app.put('/api/videos/:id', (req, res) => {
+    const { title, thumbnail, video_url } = req.body;
+    db.query('UPDATE videos SET title = ?, thumbnail = ?, video_url = ? WHERE id = ?',
+    [title, thumbnail, video_url, req.params.id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json({ success: true, ...req.body });
     });
 });
 app.delete('/api/videos/:id', (req, res) => {
