@@ -13,4 +13,11 @@ connection.connect(error => {
   console.log("Successfully connected to the database.");
 });
 
-module.exports = connection;
+const getAdminByUsername = (username, callback) => {
+  connection.query('SELECT * FROM admins WHERE username = ?', [username], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results[0]);
+  });
+};
+
+module.exports = { connection, getAdminByUsername };

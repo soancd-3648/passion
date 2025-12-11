@@ -1,6 +1,6 @@
 
 -- Drop tables if they exist
-DROP TABLE IF EXISTS `projects`, `collections`, `news`, `videos`, `menu_items`, `about_info`, `contact_info`;
+DROP TABLE IF EXISTS `projects`, `collections`, `news`, `videos`, `menu_items`, `about_info`, `contact_info`, `admins`;
 
 -- Create tables
 CREATE TABLE `projects` (
@@ -59,6 +59,12 @@ CREATE TABLE `contact_info` (
   `map_img` VARCHAR(255)
 );
 
+CREATE TABLE `admins` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `username` VARCHAR(255) NOT NULL UNIQUE,
+  `password` VARCHAR(255) NOT NULL
+);
+
 -- Insert sample data
 INSERT INTO `projects` (`title`, `category`, `img`, `description`) VALUES
 ('Project 1', 'Category A', 'img/project1.jpg', 'Description for project 1'),
@@ -87,3 +93,5 @@ INSERT INTO `about_info` (`id`, `title`, `description`, `img`) VALUES
 
 INSERT INTO `contact_info` (`id`, `address`, `hotline`, `email`, `map_img`) VALUES
 (1, '123 Main St, Anytown, USA', '555-1234', 'contact@example.com', 'img/map.jpg');
+
+INSERT INTO `admins` (`username`, `password`) VALUES ('admin', '$2b$10$TvDl.g4Phjxd75vKYuLFHeE3Yia0sOctwdkkbU33Zae5YCgAh5lsa');

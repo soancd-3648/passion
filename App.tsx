@@ -1,10 +1,11 @@
 
 import React, { useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, useLocation, Outlet } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, useLocation, Outlet, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // Context
 import { DataProvider } from './context/DataContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Component Imports
 import Navbar from './components/Navbar';
@@ -14,10 +15,23 @@ import Collections from './pages/Collections';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import ProductDetail from './pages/ProductDetail';
+import LoginPage from './pages/LoginPage'; // Import the login page
 
 // Admin Imports
 import AdminLayout from './admin/AdminLayout';
 import { Dashboard, ManageMenu, ManageProjects, ManageCollections, ManageNews, ManageAbout, ManageContact, ManageVideos } from './admin/pages';
+
+// --- Protected Route for Admin ---
+const ProtectedRoute: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Or a spinner
+  }
+
+  return isAuthenticated ? <AdminLayout /> : <Navigate to="/login" replace />;
+};
+
 
 // --- Page Wrapper for Transitions ---
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -58,8 +72,11 @@ const LocationAwareRoutes = () => {
     return (
         <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
+                {/* Login Route */}
+                <Route path="/login" element={<LoginPage />} />
+
                 {/* Admin Route Layout */}
-                <Route path="/admin" element={<AdminLayout />}>
+                <Route path="/admin" element={<ProtectedRoute />}>
                     <Route index element={<Dashboard />} />
                     <Route path="menu" element={<ManageMenu />} />
                     <Route path="projects" element={<ManageProjects />} />
@@ -87,11 +104,13 @@ const LocationAwareRoutes = () => {
 
 function App() {
   return (
-    <DataProvider>
-      <Router>
-        <LocationAwareRoutes />
-      </Router>
-    </DataProvider>
+    <AuthProvider>
+        <DataProvider>
+          <Router>
+            <LocationAwareRoutes />
+          </Router>
+        </DataProvider>
+    </AuthProvider>
   );
 }
 
