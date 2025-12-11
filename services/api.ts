@@ -1,5 +1,5 @@
 
-import { Project, Collection, NewsItem, MenuItem } from '../context/DataContext';
+import { Project, Collection, NewsItem, MenuItem, AboutInfo, ContactInfo, VideoItem } from '../types';
 
 const USE_REAL_API = true; // Use real backend
 const API_URL = 'http://localhost:5000/api';
@@ -22,27 +22,6 @@ const apiRequest = async <T>(path: string, options: RequestInit = {}): Promise<T
     return res.json();
 };
 
-
-// Types
-export interface AboutInfo {
-    title: string;
-    description: string;
-    img: string;
-}
-
-export interface ContactInfo {
-    address: string;
-    hotline: string;
-    email: string;
-    map_img: string;
-}
-
-export interface VideoItem {
-    id: number;
-    title: string;
-    thumbnail: string;
-    video_url: string;
-}
 
 export const api = {
     // --- PROJECTS ---

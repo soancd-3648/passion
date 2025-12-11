@@ -1,40 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { api, AboutInfo, ContactInfo, VideoItem } from '../services/api';
-
-// --- Model Definitions ---
-export type { AboutInfo, ContactInfo, VideoItem } from '../services/api';
-
-export interface Project {
-  id: number;
-  title: string;
-  category: string;
-  img: string;
-  description?: string;
-}
-
-export interface MenuItem {
-  id: number;
-  label: string;
-  subLabel?: string;
-  path: string;
-  order: number;
-}
-
-export interface Collection {
-    id: number;
-    name: string;
-    img: string;
-    description?: string;
-}
-
-export interface NewsItem {
-    id: number;
-    title: string;
-    date: string;
-    summary: string;
-    img: string;
-}
+import { api } from '../services/api';
+import { Project, Collection, NewsItem, MenuItem, AboutInfo, ContactInfo, VideoItem } from '../types';
 
 // --- Context Type Definition ---
 interface DataContextType {
@@ -94,44 +61,22 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // --- Data Loading Effect ---
   useEffect(() => {
-    const loadAllData = async () => {
-      try {
-        const [
-          projects,
-          collections,
-          news,
-          videos,
-          menuItems,
-          aboutData,
-          contactInfo
-        ] = await Promise.all([
-          api.getProjects(),
-          api.getCollections(),
-          api.getNews(),
-          api.getVideos(),
-          api.getMenuItems(),
-          api.getAbout(),
-          api.getContact()
-        ]);
-
-        setState({
-          projects,
-          collections,
-          news,
-          videos,
-          menuItems,
-          aboutData,
-          contactInfo,
-          isLoaded: true
-        });
-
-      } catch (error) {
-        console.error("Failed to load data:", error);
-        // Handle loading error appropriately
-      }
+    const mockData = {
+      projects: [{ id: 1, title: 'Mock Project', category: 'Mock Category', img: 'https://via.placeholder.com/300', description: 'This is a mock project.' }],
+      menuItems: [
+        { id: 1, label: 'Home', path: '/', order: 1 },
+        { id: 2, label: 'Collections', path: '/collections', order: 2 },
+        { id: 3, label: 'Projects', path: '/projects', order: 3 },
+        { id: 4, label: 'Contact', path: '/contact', order: 4 },
+      ],
+      collections: [{ id: 1, name: 'Mock Collection', img: 'https://via.placeholder.com/300', description: 'A mock collection.' }],
+      news: [{ id: 1, title: 'Mock News', date: '2024-01-01', summary: 'Summary of mock news.', img: 'https://via.placeholder.com/300' }],
+      videos: [],
+      aboutData: { title: 'About Us (Mock)', description: 'This is a mock description for the about page.', img: 'https://via.placeholder.com/400' },
+      contactInfo: { address: '123 Mock Street', hotline: '123-456-7890', email: 'contact@mock.com', map_img: 'https://via.placeholder.com/400' },
+      isLoaded: true,
     };
-
-    loadAllData();
+    setState(s => ({...s, ...mockData}));
   }, []);
 
   // --- CRUD Implementations ---
