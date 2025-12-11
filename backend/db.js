@@ -3,8 +3,9 @@ const mysql = require('mysql2');
 // Thay đổi thông tin kết nối của bạn ở đây
 const connection = mysql.createConnection({
   host: 'localhost',
+  port: 8889,        // MAMP MySQL port (thật sự là 8889, không phải 8888)
   user: 'root',      // Tên đăng nhập MySQL của bạn
-  password: '',      // Mật khẩu MySQL của bạn
+  password: 'root',  // MAMP default password là 'root'
   database: 'passion_interiors'
 });
 
@@ -20,4 +21,9 @@ const getAdminByUsername = (username, callback) => {
   });
 };
 
-module.exports = { connection, getAdminByUsername };
+// Export connection.query as db.query for compatibility
+module.exports = { 
+  connection, 
+  getAdminByUsername,
+  query: connection.query.bind(connection)  // Bind để giữ đúng context
+};

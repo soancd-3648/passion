@@ -24,7 +24,7 @@ app.post('/api/login', (req, res) => {
         }
 
         const admin = results[0];
-        const isMatch = await bcrypt.compare(password, admin.password_hash);
+        const isMatch = await bcrypt.compare(password, admin.password);
 
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
