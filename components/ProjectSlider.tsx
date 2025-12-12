@@ -2,8 +2,8 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import 'swiper/css/effect-cards';
-import { EffectCards } from 'swiper/modules';
+import 'swiper/css/navigation';
+import { Navigation } from 'swiper/modules';
 import { useData } from '../context/DataContext';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -12,16 +12,19 @@ const ProjectSlider: React.FC = () => {
   const { projects } = useData();
 
   return (
-    <div className="w-full lg:w-1/2 h-full flex items-center justify-center">
+    <div className="w-full lg:w-1/2">
       <Swiper
-        effect={'cards'}
-        grabCursor={true}
-        modules={[EffectCards]}
-        className="w-[320px] h-[420px]"
+        navigation={true}
+        modules={[Navigation]}
+        slidesPerView={2}
+        spaceBetween={30}
+        className="w-full"
       >
         {projects.map((project, index) => (
-          <SwiperSlide key={index} className="rounded-lg overflow-hidden shadow-lg bg-white transition-transform duration-300 hover:-translate-y-4">
-            <img src={project.img} alt={project.title} className="w-full h-2/3 object-cover" />
+          <SwiperSlide key={index} className="rounded-lg overflow-hidden shadow-lg bg-white group">
+            <div className="h-[320px] overflow-hidden">
+                <img src={project.img} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
             <div className="p-4">
               <h3 className="font-serif text-xl font-medium text-gray-800">{project.title}</h3>
               <p className="text-sm text-gray-600 mb-4">{project.category}</p>
