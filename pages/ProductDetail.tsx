@@ -1,21 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
 import { useData } from '../context/DataContext';
-
-const SectionReveal: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.8, delay, ease: "easeOut" }}
-    >
-      {children}
-    </motion.div>
-  );
-};
+import PageAnimation from '../components/PageAnimation';
 
 const ProductDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -49,19 +36,19 @@ const ProductDetail: React.FC = () => {
         <div className="bg-white pt-32 pb-20">
              {/* Title */}
              <div className="container mx-auto px-6 text-center mb-16">
-                <SectionReveal>
+                <PageAnimation>
                     <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl uppercase tracking-widest">{title}</h1>
-                </SectionReveal>
+                </PageAnimation>
              </div>
 
              {/* Intro Section */}
              <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32 items-center">
-                <SectionReveal>
+                <PageAnimation>
                     <div className="aspect-[3/4] overflow-hidden">
                         <img src={image} alt={title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" />
                     </div>
-                </SectionReveal>
-                <SectionReveal delay={0.2}>
+                </PageAnimation>
+                <PageAnimation delay={0.2}>
                     <h2 className="font-serif text-3xl mb-8 leading-snug">Vẻ đẹp kiến trúc trong thiết kế</h2>
                     <div className="space-y-6 text-gray-500 text-sm leading-loose text-justify font-light">
                         <p className="first-letter:text-5xl first-letter:font-serif first-letter:float-left first-letter:mr-2">
@@ -74,40 +61,40 @@ const ProductDetail: React.FC = () => {
                              Sự phối hợp khéo léo giữa ánh sáng tự nhiên và chất liệu cao cấp tạo nên chiều sâu cho không gian. Đây không chỉ là một ngôi nhà, mà là một tác phẩm nghệ thuật sống động, nơi gia chủ tìm thấy sự bình yên và thăng hoa trong từng khoảnh khắc.
                         </p>
                     </div>
-                </SectionReveal>
+                </PageAnimation>
              </div>
 
              {/* Full Width Image 1 */}
              <div className="mb-8">
-                <SectionReveal>
+                <PageAnimation>
                      <img src={`https://picsum.photos/seed/${title}1/1920/1000`} className="w-full h-[60vh] md:h-[80vh] object-cover" alt="Wide View" />
-                </SectionReveal>
+                </PageAnimation>
              </div>
 
              {/* Split Images */}
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 px-4">
-                 <SectionReveal>
+                 <PageAnimation>
                     <img src={`https://picsum.photos/seed/${title}2/800/1000`} className="w-full h-[400px] md:h-[600px] object-cover" alt="Detail 1" />
-                 </SectionReveal>
-                 <SectionReveal delay={0.2}>
+                 </PageAnimation>
+                 <PageAnimation delay={0.2}>
                     <img src={`https://picsum.photos/seed/${title}3/800/1000`} className="w-full h-[400px] md:h-[600px] object-cover" alt="Detail 2" />
-                 </SectionReveal>
+                 </PageAnimation>
              </div>
 
              {/* Feature Image (Decor) */}
              <div className="mb-4 px-4">
-                 <SectionReveal>
+                 <PageAnimation>
                     <img src={`https://picsum.photos/seed/${title}4/1920/1200`} className="w-full h-[60vh] md:h-[80vh] object-cover" alt="Decor" />
-                 </SectionReveal>
+                 </PageAnimation>
              </div>
 
              {/* Architectural Detail (Pillar/Carving) */}
              <div className="mb-32 px-4">
-                 <SectionReveal>
+                 <PageAnimation>
                     <div className="flex justify-center bg-gray-50 py-20">
                         <img src={`https://picsum.photos/seed/${title}5/800/1000`} className="max-h-[600px] md:max-h-[800px] object-contain shadow-xl" alt="Architectural Detail" />
                     </div>
-                 </SectionReveal>
+                 </PageAnimation>
              </div>
 
              {/* Functional Grid (Drawers etc) */}
@@ -117,8 +104,8 @@ const ProductDetail: React.FC = () => {
                      <div className="w-12 h-1 bg-accent mx-auto mt-4"></div>
                  </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <SectionReveal><img src={`https://picsum.photos/seed/${title}6/800/600`} className="w-full h-[300px] md:h-[400px] object-cover" alt="Detail 1"/></SectionReveal>
-                     <SectionReveal delay={0.1}><img src={`https://picsum.photos/seed/${title}7/800/600`} className="w-full h-[300px] md:h-[400px] object-cover" alt="Detail 2"/></SectionReveal>
+                     <PageAnimation><img src={`https://picsum.photos/seed/${title}6/800/600`} className="w-full h-[300px] md:h-[400px] object-cover" alt="Detail 1"/></PageAnimation>
+                     <PageAnimation delay={0.1}><img src={`https://picsum.photos/seed/${title}7/800/600`} className="w-full h-[300px] md:h-[400px] object-cover" alt="Detail 2"/></PageAnimation>
                 </div>
              </div>
 

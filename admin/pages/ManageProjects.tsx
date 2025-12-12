@@ -10,6 +10,7 @@ const ManageProjects: React.FC = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState<Partial<Project>>({});
+    const [isLoading, setIsLoading] = useState(false);
 
     // Define form fields for the Project editor
     const fields: FormField<Project>[] = [
@@ -42,6 +43,7 @@ const ManageProjects: React.FC = () => {
             return alert("Vui lòng điền đầy đủ Tên dự án và Phân loại.");
         }
         
+        setIsLoading(true);
         try {
             if (editingId) {
                 await updateProject(editingId, formData);
@@ -52,6 +54,22 @@ const ManageProjects: React.FC = () => {
         } catch (error) {
             console.error("Failed to save project:", error);
             alert("Đã có lỗi xảy ra! Không thể lưu dự án.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        if (window.confirm('Bạn có chắc chắn muốn xóa dự án này?')) {
+            setIsLoading(true);
+            try {
+                await deleteProject(id);
+            } catch (error) {
+                console.error("Failed to delete project:", error);
+                alert("Đã có lỗi xảy ra! Không thể xóa dự án.");
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
     
@@ -67,6 +85,7 @@ const ManageProjects: React.FC = () => {
                 fields={fields}
                 onSave={handleSave}
                 onCancel={handleCancel}
+                isLoading={isLoading}
             />
 
             <Table>
@@ -86,12 +105,12 @@ const ManageProjects: React.FC = () => {
                             <Td>{item.category}</Td>
                             <Td>
                                 <div className="flex space-x-2 justify-end">
-                                    <ActionButton icon={Edit2} color="text-blue-600" onClick={() => handleOpenForm(item)} />
-                                    <ActionButton icon={Trash2} color="text-red-500" onClick={() => window.confirm('Bạn có chắc chắn muốn xóa dự án này?') && deleteProject(item.id)}/>
+                                    <ActionButton icon={Edit2} color="text-blue-600" onClick={() => handleOpenForm(item)} disabled={isLoading} />
+                                    <ActionButton icon={Trash2} color="text-red-500" onClick={() => handleDelete(item.id)} disabled={isLoading} />
                                 </div>
                             </Td>
                         </tr>
-                    ))}
+                    ))}\
                 </tbody>
             </Table>
         </div>
