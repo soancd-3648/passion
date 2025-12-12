@@ -153,5 +153,3 @@ export const useData = () => {
   }
   return context;
 };
-
-export { Project };
