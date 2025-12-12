@@ -20,7 +20,7 @@ const ProjectSlider: React.FC = () => {
         className="w-[320px] h-[420px]"
       >
         {projects.map((project, index) => (
-          <SwiperSlide key={index} className="rounded-lg overflow-hidden shadow-lg bg-white">
+          <SwiperSlide key={index} className="rounded-lg overflow-hidden shadow-lg bg-white transition-transform duration-300 hover:-translate-y-4">
             <img src={project.img} alt={project.title} className="w-full h-2/3 object-cover" />
             <div className="p-4">
               <h3 className="font-serif text-xl font-medium text-gray-800">{project.title}</h3>
