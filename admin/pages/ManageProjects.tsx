@@ -15,7 +15,7 @@ const ManageProjects: React.FC = () => {
     const fields: FormField<Project>[] = [
         { name: 'title', placeholder: 'Tên dự án' },
         { name: 'category', placeholder: 'Loại (VD: Villa, Apartment)' },
-        { name: 'img', placeholder: 'Link hình ảnh đại diện', colSpan: 2 },
+        { name: 'img', placeholder: 'Ảnh đại diện', type: 'image', colSpan: 2 },
         { name: 'description', placeholder: 'Mô tả chi tiết về dự án', type: 'textarea', colSpan: 2 },
     ];
 
@@ -25,7 +25,8 @@ const ManageProjects: React.FC = () => {
             setFormData(item);
         } else {
             setEditingId(null);
-            setFormData({ title: '', category: 'Villa', img: 'https://picsum.photos/seed/project/600/800', description: '' });
+            // Initialize with an empty img field for the uploader
+            setFormData({ title: '', category: 'Villa', img: '', description: '' });
         }
         setIsFormOpen(true);
     };
@@ -37,8 +38,8 @@ const ManageProjects: React.FC = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.title || !formData.category || !formData.img) {
-            return alert("Vui lòng điền đầy đủ các trường thông tin bắt buộc.");
+        if (!formData.title || !formData.category) {
+            return alert("Vui lòng điền đầy đủ Tên dự án và Phân loại.");
         }
         
         try {

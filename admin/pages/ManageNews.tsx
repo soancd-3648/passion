@@ -14,7 +14,7 @@ const ManageNews: React.FC = () => {
     const fields: FormField<NewsItem>[] = [
         { name: 'title', placeholder: 'Tiêu đề tin tức' },
         { name: 'date', placeholder: 'Ngày đăng', type: 'date' },
-        { name: 'img', placeholder: 'Link hình ảnh thumbnail', colSpan: 2 },
+        { name: 'img', placeholder: 'Ảnh thumbnail', type: 'image', colSpan: 2 },
         { name: 'summary', placeholder: 'Tóm tắt nội dung tin tức', type: 'textarea', colSpan: 2 },
     ];
 
@@ -26,7 +26,8 @@ const ManageNews: React.FC = () => {
             setFormData(formattedData);
         } else {
             setEditingId(null);
-            setFormData({ title: '', date: new Date().toISOString().split('T')[0], summary: '', img: 'https://picsum.photos/seed/news/400/300' });
+            // Initialize with an empty img field for the uploader
+            setFormData({ title: '', date: new Date().toISOString().split('T')[0], summary: '', img: '' });
         }
         setIsFormOpen(true);
     };
